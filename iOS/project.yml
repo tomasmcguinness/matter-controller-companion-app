@@ -1,0 +1,92 @@
+name: MCC
+
+options:
+  bundleIdPrefix: com.tomasmcguinness
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  MCC:
+    type: application
+    platform: iOS
+    sources:
+      - path: MCC
+      - path: Shared
+    info:
+      path: MCC/Info.plist
+      properties:
+        CFBundleDisplayName: MCC
+        NSLocalNetworkUsageDescription: MCC talks to your Matter controllers on your local network.
+        NSBonjourServices:
+          - _http._tcp
+          - _matter._tcp
+          - _matterc._tcp
+          - _matterd._tcp
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    entitlements:
+      path: MCC/MCC.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.tomasmcguinness.matter-controller-companion
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tomasmcguinness.matter-controller-companion
+        CODE_SIGN_ENTITLEMENTS: MCC/MCC.entitlements
+    dependencies:
+      - sdk: MatterSupport.framework
+      - target: MCCExtension
+        embed: true
+        codeSign: true
+        removeHeaders: true
+
+  MCCExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: MCCExtension
+      - path: Shared
+    info:
+      path: MCCExtension/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.matter.support.extension.device-setup
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).RequestHandler
+        NSLocalNetworkUsageDescription: This extension sends the device's setup code to your Matter controller.
+        NSBonjourServices:
+          - _http._tcp
+          - _matter._tcp
+          - _matterc._tcp
+          - _matterd._tcp
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    entitlements:
+      path: MCCExtension/MCCExtension.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.tomasmcguinness.matter-controller-companion
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tomasmcguinness.matter-controller-companion.MCCExtension
+        CODE_SIGN_ENTITLEMENTS: MCCExtension/MCCExtension.entitlements
+        SKIP_INSTALL: YES
+    dependencies:
+      - sdk: MatterSupport.framework
+
+schemes:
+  MCC:
+    build:
+      targets:
+        MCC: all
+    run:
+      config: Debug
+    archive:
+      config: Release
