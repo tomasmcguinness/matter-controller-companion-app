@@ -38,7 +38,7 @@ final class DeviceListModel {
 
     /// Waits for a freshly commissioned node to show up.
     ///
-    /// The controller doesn't answer `POST /api/nodes` until commissioning has finished, so
+    /// The controller doesn't answer `POST /api/companion/nodes` until commissioning has finished, so
     /// the node is normally there on the first refresh; the retries only cover the case where
     /// the extension's own view of the outcome and the node list disagree. The extension
     /// leaves the node id it was given in the App Group for us to look for.

@@ -9,7 +9,7 @@ import os
 /// code (or taken a manual pairing code) and it hands us the decoded onboarding payload.
 ///
 /// We are not the Matter controller -- whichever controller the user picked from Home is.
-/// All this does is forward the payload to that controller's `POST /api/nodes`, which pairs
+/// All this does is forward the payload to that controller's `POST /api/companion/nodes`, which pairs
 /// the device onto its fabric. That call blocks until commissioning finishes, so what it
 /// answers with is the real outcome.
 ///

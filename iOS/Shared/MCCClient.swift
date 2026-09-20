@@ -33,11 +33,11 @@ struct MCCClient: Sendable {
     /// Confirms the controller is reachable. Used right after the user types in an address, so
     /// a bad entry fails immediately rather than on the device list.
     func checkReachable() async throws {
-        _ = try await perform(path: "/api/info", method: "GET", bodyData: nil, timeout: 20)
+        _ = try await perform(path: "/api/companion/info", method: "GET", bodyData: nil, timeout: 20)
     }
 
     func nodes() async throws -> [Node] {
-        try await get("/api/nodes")
+        try await get("/api/companion/nodes")
     }
 
     /// Hands a Matter onboarding payload to the controller, which does the actual
@@ -49,18 +49,18 @@ struct MCCClient: Sendable {
     @discardableResult
     func commission(setupCode: String) async throws -> UInt64 {
         let body = try JSONEncoder().encode(CommissionRequest(inUse: false, setupCode: setupCode))
-        let data = try await perform(path: "/api/nodes", method: "POST", bodyData: body, timeout: 90)
+        let data = try await perform(path: "/api/companion/nodes", method: "POST", bodyData: body, timeout: 90)
 
         return try decode(CommissionResponse.self, from: data).nodeId
     }
 
     func rename(nodeId: UInt64, to name: String) async throws {
         let body = try JSONEncoder().encode(RenameRequest(name: name))
-        _ = try await perform(path: "/api/nodes/\(nodeId)/update", method: "PUT", bodyData: body, timeout: 20)
+        _ = try await perform(path: "/api/companion/nodes/\(nodeId)/update", method: "PUT", bodyData: body, timeout: 20)
     }
 
     func unpair(nodeId: UInt64) async throws {
-        _ = try await perform(path: "/api/nodes/\(nodeId)", method: "DELETE", bodyData: nil, timeout: 20)
+        _ = try await perform(path: "/api/companion/nodes/\(nodeId)", method: "DELETE", bodyData: nil, timeout: 20)
     }
 
     // MARK: - Transport

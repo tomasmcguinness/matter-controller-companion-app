@@ -34,24 +34,24 @@ implementation is the ESP32 Heating Monitor firmware (`nodes_get_handler` in `ap
 - There is **no authentication**. Every request is plain JSON on the local network.
 - Any non-2xx status is treated as a failure. If the response has a body, its text is shown to the
   user, so make it readable.
-- Client timeouts are 20 seconds, except `POST /api/nodes`, which is 90 seconds.
+- Client timeouts are 20 seconds, except `POST /api/companion/nodes`, which is 90 seconds.
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| `GET` | `/api/info` | Check the controller is reachable |
-| `GET` | `/api/nodes` | List commissioned nodes |
-| `POST` | `/api/nodes` | Commission a new node |
-| `PUT` | `/api/nodes/{nodeId}/update` | Rename a node |
-| `DELETE` | `/api/nodes/{nodeId}` | Remove (unpair) a node |
+| `GET` | `/api/companion/info` | Check the controller is reachable |
+| `GET` | `/api/companion/nodes` | List commissioned nodes |
+| `POST` | `/api/companion/nodes` | Commission a new node |
+| `PUT` | `/api/companion/nodes/{nodeId}/update` | Rename a node |
+| `DELETE` | `/api/companion/nodes/{nodeId}` | Remove (unpair) a node |
 
 `{nodeId}` is the node's numeric Matter node id, in decimal.
 
-### `GET /api/info`
+### `GET /api/companion/info`
 
 Called right after the user types in an address, so a bad entry fails immediately. Any 2xx response
 counts as success; the body is ignored.
 
-### `GET /api/nodes`
+### `GET /api/companion/nodes`
 
 Returns a JSON array of nodes.
 
@@ -118,7 +118,7 @@ than failing the whole response.
 float in scientific notation (which is how cJSON prints numbers that don't fit an `int`), or as a
 decimal string. A value that can't be parsed decodes as `0`.
 
-### `POST /api/nodes`
+### `POST /api/companion/nodes`
 
 Commissions a device onto the controller's fabric.
 
@@ -147,7 +147,7 @@ really did join the fabric. The app waits up to 90 seconds. If the controller gi
 return an error status (the reference implementation returns `504`), which the app reports as a failed
 setup.
 
-### `PUT /api/nodes/{nodeId}/update`
+### `PUT /api/companion/nodes/{nodeId}/update`
 
 Sets the node's name. The app calls this after commissioning, with the name the user typed into the
 system setup sheet, so the device has the same name in the app.
@@ -161,6 +161,6 @@ Request:
 The response body is ignored. A failure is logged but doesn't fail setup, because the device is
 already commissioned.
 
-### `DELETE /api/nodes/{nodeId}`
+### `DELETE /api/companion/nodes/{nodeId}`
 
 Removes the node from the controller. No request body; the response body is ignored.
