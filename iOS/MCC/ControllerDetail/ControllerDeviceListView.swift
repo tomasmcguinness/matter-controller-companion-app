@@ -87,7 +87,7 @@ struct ControllerDeviceListView: View {
         ControllerStore.lastCommissionedNodeId = nil
 
         let topology = MatterAddDeviceRequest.Topology(
-            ecosystemName: "MCC",
+            ecosystemName: controller.name,
             homes: [MatterAddDeviceRequest.Home(displayName: controller.name)])
 
         do {
