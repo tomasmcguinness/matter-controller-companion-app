@@ -466,6 +466,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MCCExtension/MCCExtension.entitlements;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = R5QS56362W;
 				INFOPLIST_FILE = MCCExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -511,6 +512,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MCCExtension/MCCExtension.entitlements;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = R5QS56362W;
 				INFOPLIST_FILE = MCCExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
