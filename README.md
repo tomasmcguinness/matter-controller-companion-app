@@ -4,6 +4,11 @@ MCC is an iOS app for adding Matter devices to a Matter controller (hub) you run
 seeing what's on it. You add one or more controllers by address, then use the system Matter setup
 sheet to scan a device's QR code and commission it onto the controller you picked.
 
+This project exists to make it easy to commission devices into some of my other projects.
+- [Heating Monitor](https://github.com/tomasmcguinness/matter-esp32-heating-monitor)
+- [Matter Controller](https://github.com/tomasmcguinness/matter-esp32-controller)
+- [Home Energy Manager](https://github.com/tomasmcguinness/matter-esp32-home-energy-manager)
+
 The project has two targets:
 
 - **MCC** — the app. Lists controllers and their devices, and starts the system setup flow.
