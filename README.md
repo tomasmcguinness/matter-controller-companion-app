@@ -24,6 +24,9 @@ cd iOS
 xcodegen generate
 ```
 
+> [!CAUTION]
+> Communication between the App and the API is completely *open and insecure*, so only use this in an environment you trust. I will be adding some sort of pairing process to provide secure communication. All Matter based communication is fully encrypted.
+
 ## Controller API
 
 A controller has to implement these endpoints for MCC to work with it. This is exactly what the app
