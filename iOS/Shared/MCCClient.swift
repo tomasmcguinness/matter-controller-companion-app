@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Talks to a Matter controller's REST API.
 ///
@@ -6,6 +7,9 @@ import Foundation
 /// controller it was built for. There is no authentication in this API -- every request is
 /// plain, unauthenticated JSON over HTTP on the local network.
 struct MCCClient: Sendable {
+
+    private static let logger = Logger(subsystem: "com.tomasmcguinness.matter-controller-companion",
+                                       category: "MCCClient")
 
     let controller: Controller
 
@@ -67,8 +71,18 @@ struct MCCClient: Sendable {
 
     /// Built by string rather than `appendingPathComponent`, which escapes and re-normalises
     /// in ways that don't survive a leading slash cleanly.
+    ///
+    /// Trims a trailing slash off the base and requires `path` to supply its own leading
+    /// slash, so a controller address saved with a trailing slash (e.g. `http://host/`)
+    /// can't produce a double slash that a server's routing treats as an unmatched path.
     private func makeRequest(baseURL: URL, path: String, method: String, timeout: TimeInterval) -> URLRequest? {
-        guard let url = URL(string: baseURL.absoluteString + path) else {
+        var base = baseURL.absoluteString
+
+        if base.hasSuffix("/") {
+            base.removeLast()
+        }
+
+        guard let url = URL(string: base + path) else {
             return nil
         }
 
@@ -76,6 +90,10 @@ struct MCCClient: Sendable {
 
         request.httpMethod = method
         request.timeoutInterval = timeout
+        // These addresses get reassigned on the local network (DHCP, a swapped device, a
+        // controller reflashed at the same IP), so a cached response for a URL can go stale
+        // in a way the HTTP layer has no way to know about. Always hit the network.
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         return request
@@ -86,6 +104,8 @@ struct MCCClient: Sendable {
         guard var request = makeRequest(baseURL: controller.url, path: path, method: method, timeout: timeout) else {
             throw ClientError.unreachable(controller.url.absoluteString, underlying: nil)
         }
+
+        Self.logger.debug("\(method, privacy: .public) \(request.url?.absoluteString ?? "<no URL>", privacy: .public)")
 
         if let bodyData {
             request.httpBody = bodyData
@@ -115,6 +135,8 @@ struct MCCClient: Sendable {
 
     private func get<Response: Decodable>(_ path: String) async throws -> Response {
         let data = try await perform(path: path, method: "GET", bodyData: nil, timeout: 20)
+
+        Self.logger.debug("GET \(path, privacy: .public) received: \(String(data: data, encoding: .utf8) ?? "<non-UTF8 data>", privacy: .public)")
 
         return try decode(Response.self, from: data)
     }
