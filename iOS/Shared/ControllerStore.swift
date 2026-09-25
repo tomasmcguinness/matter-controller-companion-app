@@ -45,6 +45,20 @@ enum ControllerStore {
         controllers = current
     }
 
+    /// Replaces the stored controller with the same id, keeping its position in the list.
+    static func update(_ controller: Controller) throws {
+        guard defaults != nil else {
+            throw ControllerStoreError.appGroupUnavailable
+        }
+
+        var current = controllers
+
+        guard let index = current.firstIndex(where: { $0.id == controller.id }) else { return }
+
+        current[index] = controller
+        controllers = current
+    }
+
     static func remove(id: UUID) {
         controllers.removeAll { $0.id == id }
     }
