@@ -67,7 +67,6 @@
 		895E22895A49FE4C04F31718 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		9A44DF2D188B187E2C5B5147 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9BF597BA39654498EC71B827 /* MCCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCCClient.swift; sourceTree = "<group>"; };
-		ADDAAF80A3E4841BA3310177 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AF5B4EA0F631C8D6E06B1D83 /* ControllerDeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerDeviceListView.swift; sourceTree = "<group>"; };
 		B1B46F8555685371DE1D6D99 /* MatterSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MatterSupport.framework; path = System/Library/Frameworks/MatterSupport.framework; sourceTree = SDKROOT; };
 		B4018BD856A184B20C1F82F5 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
@@ -169,7 +168,6 @@
 			children = (
 				2A9B66E450878D75A73E2C4B /* Assets.xcassets */,
 				6243E43AE875BC945B367C6A /* ContentView.swift */,
-				ADDAAF80A3E4841BA3310177 /* Info.plist */,
 				DA0AA3E0E7D911F9F31543D8 /* MCC.entitlements */,
 				4B6A4DA1A22A2AD1CBC16F0E /* MCCApp.swift */,
 				CDA54AF5564DEDF9532BE3F1 /* ControllerDetail */,
@@ -386,8 +384,10 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
-				INFOPLIST_FILE = MCC/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MCC;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -503,8 +503,10 @@
 				CODE_SIGN_ENTITLEMENTS = MCC/MCC.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 5;
-				INFOPLIST_FILE = MCC/Info.plist;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MCC;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

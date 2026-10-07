@@ -40,6 +40,6 @@
 		<string>$(PRODUCT_MODULE_NAME).RequestHandler</string>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>This extension sends the device's setup code to your Matter controller.</string>
+	<string>This extension sends the device&apos;s setup code to your Matter controller.</string>
 </dict>
 </plist>
