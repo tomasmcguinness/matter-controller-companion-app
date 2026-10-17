@@ -18,6 +18,8 @@ final class ControllersModel {
 
         for controller in doomed {
             ControllerStore.remove(id: controller.id)
+            RelayCredentialStore.removePassword(for: controller.id)
+            PushManager.shared.controllerRemoved(id: controller.id)
         }
     }
 }

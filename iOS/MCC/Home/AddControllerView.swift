@@ -10,6 +10,8 @@ struct AddControllerView: View {
 
     @State private var name: String
     @State private var addressText: String
+    @State private var relayUsername: String
+    @State private var relayPassword: String
     @State private var isVerifying = false
     @State private var errorMessage: String?
 
@@ -18,6 +20,13 @@ struct AddControllerView: View {
         self.onSaved = onSaved
         _name = State(initialValue: editing?.name ?? "")
         _addressText = State(initialValue: editing?.url.absoluteString ?? "")
+        _relayUsername = State(initialValue: editing?.relayUsername ?? "")
+        _relayPassword = State(initialValue: editing.flatMap { RelayCredentialStore.password(for: $0.id) } ?? "")
+    }
+
+    /// The password this controller had when the sheet opened, to tell whether it changed.
+    private var originalPassword: String {
+        editing.flatMap { RelayCredentialStore.password(for: $0.id) } ?? ""
     }
 
     private var isEditing: Bool { editing != nil }
@@ -35,6 +44,20 @@ struct AddControllerView: View {
                         //.textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         //.keyboardType(.URL)
+                }
+
+                Section {
+                    TextField("Username", text: $relayUsername)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .textContentType(.username)
+
+                    SecureField("Password", text: $relayPassword)
+                        .textContentType(.password)
+                } header: {
+                    Text("Push Relay")
+                } footer: {
+                    Text("The controller signs in to the push relay with these to send you notifications. Leave them blank if this controller shouldn't send notifications.")
                 }
             }
             .navigationTitle(isEditing ? "Edit Controller" : "Add Controller")
@@ -64,6 +87,12 @@ struct AddControllerView: View {
         name.trimmingCharacters(in: .whitespaces)
     }
 
+    /// Nil when blank, so a controller without notifications has no username at all.
+    private var trimmedRelayUsername: String? {
+        let trimmed = relayUsername.trimmingCharacters(in: .whitespaces)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
     private var canSave: Bool {
         guard !trimmedName.isEmpty,
               let url = Controller.connectionURL(from: addressText) else {
@@ -71,7 +100,10 @@ struct AddControllerView: View {
         }
 
         if let editing {
-            return trimmedName != editing.name || url != editing.url
+            return trimmedName != editing.name
+                || url != editing.url
+                || trimmedRelayUsername != editing.relayUsername
+                || relayPassword != originalPassword
         }
 
         return true
@@ -83,7 +115,10 @@ struct AddControllerView: View {
             return
         }
 
-        let candidate = Controller(id: editing?.id ?? UUID(), name: trimmedName, url: url)
+        let candidate = Controller(id: editing?.id ?? UUID(),
+                                   name: trimmedName,
+                                   url: url,
+                                   relayUsername: trimmedRelayUsername)
 
         isVerifying = true
         defer { isVerifying = false }
@@ -99,6 +134,11 @@ struct AddControllerView: View {
             } else {
                 try ControllerStore.add(candidate)
             }
+
+            RelayCredentialStore.setPassword(trimmedRelayUsername == nil ? nil : relayPassword, for: candidate.id)
+
+            // Don't hold the sheet open while the controller is told; Settings shows how it went.
+            Task { await PushManager.shared.controllerSaved(candidate) }
 
             onSaved()
             dismiss()

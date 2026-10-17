@@ -40,6 +40,7 @@ targets:
     entitlements:
       path: MCC/MCC.entitlements
       properties:
+        aps-environment: development
         com.apple.security.application-groups:
           - group.com.tomasmcguinness.matter-controller-companion
     settings:

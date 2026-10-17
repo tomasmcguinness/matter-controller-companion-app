@@ -10,10 +10,16 @@ struct Controller: Codable, Identifiable, Equatable, Hashable, Sendable {
     var name: String
     var url: URL
 
-    init(id: UUID = UUID(), name: String, url: URL) {
+    /// The username this controller signs in to the push relay with. The matching password is
+    /// in the Keychain (see `RelayCredentialStore`); nil when notifications aren't set up for
+    /// this controller.
+    var relayUsername: String?
+
+    init(id: UUID = UUID(), name: String, url: URL, relayUsername: String? = nil) {
         self.id = id
         self.name = name
         self.url = url
+        self.relayUsername = relayUsername
     }
 }
 

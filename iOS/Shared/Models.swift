@@ -220,6 +220,25 @@ struct RenameRequest: Encodable, Sendable {
     let name: String
 }
 
+/// Everything a controller needs to send this phone a notification through the push relay.
+struct NotificationTarget: Encodable, Sendable {
+    let relayUrl: String
+    let username: String
+    let password: String
+    /// The APNs device token, as lowercase hex.
+    let deviceToken: String
+    /// `sandbox` or `production` -- which APNs the token belongs to.
+    let environment: String
+}
+
+/// The body of `POST /v1/push` on the push relay. Controllers send the same thing.
+struct PushRequest: Encodable, Sendable {
+    let deviceToken: String
+    let environment: String
+    let title: String
+    let body: String
+}
+
 // MARK: - Lenient number decoding
 
 extension KeyedDecodingContainer {

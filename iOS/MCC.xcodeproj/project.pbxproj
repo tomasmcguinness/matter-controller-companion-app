@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0204DF494F4AFAA31CDF86F1 /* PushRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53CA444A9690D583EBB03B1F /* PushRelay.swift */; };
 		0E4E57AA9E860F315CB0AB2F /* MCCApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6A4DA1A22A2AD1CBC16F0E /* MCCApp.swift */; };
 		0E87534486702F4ACEA29E8C /* RequestHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA7A161389228ADFB3A2737 /* RequestHandler.swift */; };
 		27AE886ED87BBE7DA453DB2A /* MCCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF597BA39654498EC71B827 /* MCCClient.swift */; };
 		2F72B6DA05CB988348663DF2 /* AddControllerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793836B374D855D132900FF3 /* AddControllerView.swift */; };
+		3D61BE917FD6D6DC1E174EBB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A3104DB4DE5ABE0F23BE5B /* AppDelegate.swift */; };
 		414393FBBF54052658C7B418 /* ControllerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0D1708AFB076080BABF7E2 /* ControllerStore.swift */; };
 		5293D7DE17DB10BF76E26E7C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6001A4D2A4FF30E175CBA479 /* SettingsView.swift */; };
+		53E2A316D8ACFB2B007C35BC /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F446A1DE8946B3463ED51548 /* PushManager.swift */; };
 		598FEA7AC86E2E558BD4B9D8 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895E22895A49FE4C04F31718 /* Models.swift */; };
 		5FB399D2C5EA52DA4D44B3C6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6243E43AE875BC945B367C6A /* ContentView.swift */; };
 		6C0E04F6DABBE44361DFC618 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A9B66E450878D75A73E2C4B /* Assets.xcassets */; };
@@ -26,6 +29,7 @@
 		DF0E7B3C5A024A66D07DB053 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A44DF2D188B187E2C5B5147 /* HomeView.swift */; };
 		E67AD8C41C2285E5DAABE0BB /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895E22895A49FE4C04F31718 /* Models.swift */; };
 		ECC69574BFE667AC870FE24F /* ControllerDeviceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF5B4EA0F631C8D6E06B1D83 /* ControllerDeviceListView.swift */; };
+		F32B897D02B4A03FB645F822 /* RelayCredentialStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70FAB7F249711AA228792AFA /* RelayCredentialStore.swift */; };
 		F36DE2A32E76F24850903F37 /* DeviceListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2550C254E47856954A3AB93B /* DeviceListModel.swift */; };
 		FD42D576BE003A2E2300AB30 /* MatterSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1B46F8555685371DE1D6D99 /* MatterSupport.framework */; };
 /* End PBXBuildFile section */
@@ -59,10 +63,13 @@
 		2142D2F033B5B3E9CA492984 /* ControllersModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllersModel.swift; sourceTree = "<group>"; };
 		2550C254E47856954A3AB93B /* DeviceListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceListModel.swift; sourceTree = "<group>"; };
 		2A9B66E450878D75A73E2C4B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		38A3104DB4DE5ABE0F23BE5B /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4B6A4DA1A22A2AD1CBC16F0E /* MCCApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCCApp.swift; sourceTree = "<group>"; };
+		53CA444A9690D583EBB03B1F /* PushRelay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PushRelay.swift; sourceTree = "<group>"; };
 		56072F0A296FEB5543755AAB /* MCCExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MCCExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		6001A4D2A4FF30E175CBA479 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6243E43AE875BC945B367C6A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		70FAB7F249711AA228792AFA /* RelayCredentialStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RelayCredentialStore.swift; sourceTree = "<group>"; };
 		793836B374D855D132900FF3 /* AddControllerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddControllerView.swift; sourceTree = "<group>"; };
 		895E22895A49FE4C04F31718 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		9A44DF2D188B187E2C5B5147 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -74,6 +81,7 @@
 		CFA7A161389228ADFB3A2737 /* RequestHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestHandler.swift; sourceTree = "<group>"; };
 		DA0AA3E0E7D911F9F31543D8 /* MCC.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MCC.entitlements; sourceTree = "<group>"; };
 		EA4A3091ED08CF557817F35C /* MCC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MCC.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F446A1DE8946B3463ED51548 /* PushManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		F806A386BBCB8DF1386481EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -135,6 +143,17 @@
 			);
 			sourceTree = "<group>";
 		};
+		9332E5007702FD90F8F34B26 /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				38A3104DB4DE5ABE0F23BE5B /* AppDelegate.swift */,
+				F446A1DE8946B3463ED51548 /* PushManager.swift */,
+				53CA444A9690D583EBB03B1F /* PushRelay.swift */,
+				70FAB7F249711AA228792AFA /* RelayCredentialStore.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
 		C91C1DB037D6597327995E8D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -173,6 +192,7 @@
 				CDA54AF5564DEDF9532BE3F1 /* ControllerDetail */,
 				1CD8FA5EE36AE001BB0D49B6 /* Home */,
 				410671AB42D63D3FA1228E43 /* Settings */,
+				9332E5007702FD90F8F34B26 /* Notifications */,
 			);
 			path = MCC;
 			sourceTree = "<group>";
@@ -202,8 +222,6 @@
 			dependencies = (
 			);
 			name = MCCExtension;
-			packageProductDependencies = (
-			);
 			productName = MCCExtension;
 			productReference = 56072F0A296FEB5543755AAB /* MCCExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -223,8 +241,6 @@
 				28F46370566B79F1F39DADC8 /* PBXTargetDependency */,
 			);
 			name = MCC;
-			packageProductDependencies = (
-			);
 			productName = MCC;
 			productReference = EA4A3091ED08CF557817F35C /* MCC.app */;
 			productType = "com.apple.product-type.application";
@@ -286,6 +302,10 @@
 				27AE886ED87BBE7DA453DB2A /* MCCClient.swift in Sources */,
 				598FEA7AC86E2E558BD4B9D8 /* Models.swift in Sources */,
 				5293D7DE17DB10BF76E26E7C /* SettingsView.swift in Sources */,
+				3D61BE917FD6D6DC1E174EBB /* AppDelegate.swift in Sources */,
+				53E2A316D8ACFB2B007C35BC /* PushManager.swift in Sources */,
+				0204DF494F4AFAA31CDF86F1 /* PushRelay.swift in Sources */,
+				F32B897D02B4A03FB645F822 /* RelayCredentialStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,19 +400,23 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MCC/MCC.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MCC/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MCC;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "MCC talks to your Matter controllers on your local network.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
@@ -477,14 +501,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MCCExtension/MCCExtension.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = MCCExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1.MCCExtension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -502,16 +526,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MCC/MCC.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MCC/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MCC;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "MCC talks to your Matter controllers on your local network.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -526,14 +554,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MCCExtension/MCCExtension.entitlements;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = MCCExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1.MCCExtension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;

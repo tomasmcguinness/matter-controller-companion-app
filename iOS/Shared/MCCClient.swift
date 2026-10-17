@@ -67,6 +67,17 @@ struct MCCClient: Sendable {
         _ = try await perform(path: "/api/companion/nodes/\(nodeId)", method: "DELETE", bodyData: nil, timeout: 20)
     }
 
+    /// Tells the controller where to send notifications and how to sign in to the relay.
+    func setNotificationTarget(_ target: NotificationTarget) async throws {
+        let body = try JSONEncoder().encode(target)
+        _ = try await perform(path: "/api/companion/notifications", method: "PUT", bodyData: body, timeout: 20)
+    }
+
+    /// Stops the controller sending notifications to this phone.
+    func clearNotificationTarget() async throws {
+        _ = try await perform(path: "/api/companion/notifications", method: "DELETE", bodyData: nil, timeout: 20)
+    }
+
     // MARK: - Transport
 
     /// Built by string rather than `appendingPathComponent`, which escapes and re-normalises
