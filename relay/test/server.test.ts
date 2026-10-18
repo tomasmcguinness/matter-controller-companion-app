@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import type { Alert, Environment, PushSender, SendResult } from '../src/apns.js';
+import type { FcmSender } from '../src/fcm.js';
 import { buildServer } from '../src/server.js';
 import { hashPassword, type Users } from '../src/users.js';
 
@@ -18,7 +19,19 @@ class StubSender implements PushSender {
   }
 }
 
+class StubFcmSender implements FcmSender {
+  sent: { deviceToken: string; alert: Alert }[] = [];
+  result: SendResult = { ok: true };
+
+  async send(deviceToken: string, alert: Alert): Promise<SendResult> {
+    this.sent.push({ deviceToken, alert });
+    return this.result;
+  }
+}
+
 const token = 'a1b2c3d4e5f6'.repeat(6);
+
+const fcmToken = 'dGhpcyBpcyBub3Q:APA91bH-real_token' + 'x'.repeat(100);
 
 const validBody = { deviceToken: token, environment: 'sandbox', title: 'Heating Monitor', body: 'Too hot' };
 
@@ -32,9 +45,13 @@ beforeAll(async () => {
   users = { tomas: await hashPassword('correct horse') };
 });
 
-function setup() {
+function setup({ withApns = true, withFcm = true } = {}) {
   const sender = new StubSender();
-  const app = buildServer({ loadUsers: async () => users, sender });
+  const fcmSender = new StubFcmSender();
+  const app = buildServer({
+    loadUsers: async () => users,
+    senders: { apns: withApns ? sender : undefined, fcm: withFcm ? fcmSender : undefined },
+  });
 
   const push = (payload: unknown, authorization?: string) =>
     app.inject({
@@ -44,7 +61,7 @@ function setup() {
       payload: payload as object,
     });
 
-  return { sender, push };
+  return { sender, fcmSender, push };
 }
 
 describe('POST /v1/push', () => {
@@ -129,6 +146,61 @@ describe('POST /v1/push', () => {
 
     expect(response.statusCode).toBe(502);
     expect(response.json().error).toBe('InvalidProviderToken');
+  });
+
+  it('sends an fcm push to FCM, not APNs', async () => {
+    const { sender, fcmSender, push } = setup();
+
+    const response = await push({ ...validBody, deviceToken: fcmToken, environment: 'fcm' },
+                                basic('tomas', 'correct horse'));
+
+    expect(response.statusCode).toBe(202);
+    expect(sender.sent).toHaveLength(0);
+    expect(fcmSender.sent).toEqual([{ deviceToken: fcmToken, alert: { title: 'Heating Monitor', body: 'Too hot' } }]);
+  });
+
+  it('rejects an fcm token with characters FCM never uses', async () => {
+    const { fcmSender, push } = setup();
+
+    const response = await push({ ...validBody, deviceToken: 'abc/../def', environment: 'fcm' },
+                                basic('tomas', 'correct horse'));
+
+    expect(response.statusCode).toBe(400);
+    expect(fcmSender.sent).toHaveLength(0);
+  });
+
+  it('still requires a hex token for APNs', async () => {
+    const { push } = setup();
+
+    const response = await push({ ...validBody, deviceToken: fcmToken }, basic('tomas', 'correct horse'));
+
+    expect(response.statusCode).toBe(400);
+  });
+
+  it.each([
+    [{ ok: false, status: 404, reason: 'UNREGISTERED' } as const],
+    [{ ok: false, status: 400, reason: 'INVALID_ARGUMENT' } as const],
+  ])('maps a dead FCM token to 410', async (result) => {
+    const { fcmSender, push } = setup();
+    fcmSender.result = result;
+
+    const response = await push({ ...validBody, deviceToken: fcmToken, environment: 'fcm' },
+                                basic('tomas', 'correct horse'));
+
+    expect(response.statusCode).toBe(410);
+    expect(response.json().error).toBe(result.reason);
+  });
+
+  it.each([
+    ['Android', { withFcm: false }, { ...validBody, deviceToken: fcmToken, environment: 'fcm' }],
+    ['iOS', { withApns: false }, validBody],
+  ])('says so when the relay is not set up for %s', async (platform, options, payload) => {
+    const { push } = setup(options);
+
+    const response = await push(payload, basic('tomas', 'correct horse'));
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().error).toContain(platform);
   });
 
   it('maps a connection failure to 502', async () => {

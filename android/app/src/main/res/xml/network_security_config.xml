@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Controllers are plain http on the local network, at whatever address the user typed in.
+     Domain configs can't match IP ranges, so cleartext has to be allowed everywhere. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

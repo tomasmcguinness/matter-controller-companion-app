@@ -3,3 +3,4 @@ dist
 .env
 users.json
 *.p8
+firebase-service-account*.json

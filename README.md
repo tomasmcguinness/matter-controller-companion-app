@@ -1,8 +1,8 @@
 # MCC — Matter Controller Companion
 
-MCC is an iOS app for adding Matter devices to a Matter controller (hub) you run yourself, and for
-seeing what's on it. You add one or more controllers by address, then use the system Matter setup
-sheet to scan a device's QR code and commission it onto the controller you picked.
+MCC is an iOS and Android app for adding Matter devices to a Matter controller (hub) you run
+yourself, and for seeing what's on it. You add one or more controllers by address, then use the
+system Matter setup flow to scan a device's QR code and commission it onto the controller you picked.
 
 This project exists to make it easy to commission devices into some of my other projects.
 - [Heating Monitor](https://github.com/tomasmcguinness/matter-esp32-heating-monitor)
@@ -12,13 +12,15 @@ This project exists to make it easy to commission devices into some of my other 
 The repository also contains **`relay/`**, the small self-hosted service that lets controllers send
 push notifications. See [Notifications](#notifications) and [`relay/README.md`](relay/README.md).
 
+The controller does the actual commissioning; the app only talks to it over the REST API below.
+
+### iOS (`iOS/`)
+
 The project has two targets:
 
 - **MCC** — the app. Lists controllers and their devices, and starts the system setup flow.
 - **MCCExtension** — the Matter setup extension iOS launches during that flow. It receives the
   onboarding payload and forwards it to the controller.
-
-The controller does the actual commissioning; the app only talks to it over the REST API below.
 
 The Xcode project is generated from `iOS/project.yml` with [XcodeGen](https://github.com/yonaskolb/XcodeGen):
 
@@ -27,13 +29,41 @@ cd iOS
 xcodegen generate
 ```
 
+### Android (`android/`)
+
+A Kotlin and Jetpack Compose app with the same screens. Adding a device uses the Google Play Services
+Matter API: Google's setup flow scans the code and puts the device on Wi-Fi or Thread, then calls the
+app's `MccCommissioningService`, which asks the controller to commission it over the network (see the
+[on-network variant](#post-apicompanionnodes) of `POST /api/companion/nodes`). Needs Android 8.1 or
+later with Google Play Services.
+
+Open `android/` in Android Studio to build and run it. To build from the command line you need JDK 17,
+the Android SDK and Gradle 8.14 to generate the wrapper once:
+
+```sh
+cd android
+gradle wrapper
+./gradlew :app:assembleDebug :app:testDebugUnitTest
+```
+
+For notifications, add the Firebase project's `google-services.json` to `android/app/` (it isn't
+checked in). Without it the app still builds, but notifications can't be turned on. Set the relay
+address in `PUSH_RELAY_URL` in `android/app/build.gradle.kts`.
+
+> [!NOTE]
+> Google's setup flow uses the phone's own Thread credentials. If your controller runs a Thread network
+> the phone doesn't know about, Thread devices won't join. Wi-Fi devices aren't affected. To commission
+> uncertified or test devices, turn on developer mode for Google Play Services or register the device's
+> vendor and product ids in the [Google Home Developer Console](https://console.home.google.com/).
+
 > [!CAUTION]
 > Communication between the App and the API is completely *open and insecure*, so only use this in an environment you trust. I will be adding some sort of pairing process to provide secure communication. All Matter based communication is fully encrypted.
 
 ## Controller API
 
 A controller has to implement these endpoints for MCC to work with it. This is exactly what the app
-calls (see `iOS/Shared/MCCClient.swift`) and decodes (see `iOS/Shared/Models.swift`). The reference
+calls (see `iOS/Shared/MCCClient.swift` and `android/app/src/main/java/com/tomasmcguinness/mcc/data/MccClient.kt`)
+and decodes (see `iOS/Shared/Models.swift`). The reference
 implementation is the ESP32 Heating Monitor firmware (`nodes_get_handler` in `app_main.cpp`).
 
 ### Conventions
@@ -133,9 +163,9 @@ decimal string. A value that can't be parsed decodes as `0`.
 
 ### `POST /api/companion/nodes`
 
-Commissions a device onto the controller's fabric.
+Commissions a device onto the controller's fabric. The body comes in one of two forms.
 
-Request:
+**From a setup code (iOS).** The controller does everything, including BLE and network provisioning.
 
 ```json
 {
@@ -146,8 +176,33 @@ Request:
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `inUse` | boolean | Always `false` from this app: the system setup flow only hands over devices that aren't on a fabric yet. |
+| `inUse` | boolean | `false`: the iOS setup flow only hands over devices that aren't on a fabric yet. |
 | `setupCode` | string | The onboarding payload iOS decoded from the QR code, or the manual pairing code. |
+
+**On the network (Android).** Google Play Services has already put the device on Wi-Fi or Thread and
+opened a commissioning window, and it gives the app the device's address and passcode, not the setup
+code. The controller should establish PASE with the device at that address (with the CHIP SDK,
+`PairDevice(nodeId, RendezvousParameters().SetPeerAddress(...).SetSetupPINCode(passcode))`), then
+commission it as usual.
+
+```json
+{
+  "inUse": true,
+  "passcode": 20202021,
+  "ipAddress": "fd12:3456:789a:1::5",
+  "port": 5540
+}
+```
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `inUse` | boolean | `true`: the device is already on the network. |
+| `passcode` | integer | The setup passcode for the open commissioning window. |
+| `ipAddress` | string | The device's IPv6 or IPv4 address, without brackets or a scope id. |
+| `port` | integer | The device's Matter port, usually `5540`. |
+
+A controller that doesn't support this form should return `400` with a readable message. The Android
+app can't add devices to it.
 
 Response (2xx):
 
@@ -155,7 +210,7 @@ Response (2xx):
 { "nodeId": 5 }
 ```
 
-The controller should hold the request open until commissioning finishes, so a 2xx means the device
+Both forms get the same response and timing. The controller should hold the request open until commissioning finishes, so a 2xx means the device
 really did join the fabric. The app waits up to 90 seconds. If the controller gives up first it should
 return an error status (the reference implementation returns `504`), which the app reports as a failed
 setup.
@@ -180,13 +235,13 @@ Removes the node from the controller. No request body; the response body is igno
 
 ## Notifications
 
-Controllers can send push notifications to the phone. APNs needs the app's signing key, which can't
-ship in firmware, so controllers post to a small relay ([`relay/`](relay/README.md)) that holds the
-key and forwards to Apple:
+Controllers can send push notifications to the phone. APNs and FCM need the app's credentials, which
+can't ship in firmware, so controllers post to a small relay ([`relay/`](relay/README.md)) that holds
+them and forwards to Apple (iPhone) or Google (Android):
 
 ```
 App ──PUT /api/companion/notifications──▶ controller (stores in NVS)
-controller ──POST {relayUrl}/v1/push (Basic auth)──▶ relay ──▶ APNs ──▶ phone
+controller ──POST {relayUrl}/v1/push (Basic auth)──▶ relay ──▶ APNs or FCM ──▶ phone
 ```
 
 The user gives each controller a relay username and password when adding or editing it, turns
@@ -219,8 +274,8 @@ before, and respond `204`.
 | `relayUrl` | string | Base URL of the relay. `/v1/push` is appended to it. |
 | `username` | string | Relay username for this controller. |
 | `password` | string | Relay password for this controller. |
-| `deviceToken` | string | The phone's APNs device token, lowercase hex. Pass it back unchanged. |
-| `environment` | string | `sandbox` (debug builds) or `production`. Pass it back unchanged. |
+| `deviceToken` | string | The phone's token, opaque to the controller: an APNs device token (64 hex characters) from iOS, or an FCM registration token (about 160 characters, not hex) from Android. Allow at least 256 bytes. Pass it back unchanged. |
+| `environment` | string | `sandbox` (iOS debug builds), `production` (iOS release builds) or `fcm` (Android). Pass it back unchanged. |
 
 ### `DELETE /api/companion/notifications`
 
@@ -242,11 +297,11 @@ relay credentials in the app. Erase the stored values and respond `204`.
 
 | Status | Meaning | What the controller should do |
 |--------|---------|-------------------------------|
-| `202` | Sent to Apple. | Nothing. |
+| `202` | Sent to Apple or Google. | Nothing. |
 | `400` | The body was invalid; the response says why. | Fix the request. |
 | `401` | Wrong username or password. | Stop sending until the app sends new credentials. |
 | `410` | The phone no longer accepts notifications (the app was deleted, or the token is dead). | Erase the stored token. |
-| `502` | Apple refused or couldn't be reached; the response has APNs's reason. | Retry later. |
+| `502` | APNs or FCM refused or couldn't be reached; the response has their reason. | Retry later. |
 
 With ESP-IDF this is a few lines of `esp_http_client`. The relay must have a certificate from a public
 CA so the built-in certificate bundle trusts it:

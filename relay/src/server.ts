@@ -1,24 +1,27 @@
 import Fastify, { type FastifyServerOptions } from 'fastify';
 import type { Environment, PushSender } from './apns.js';
+import type { FcmSender } from './fcm.js';
 import { checkCredentials, type UserLoader } from './users.js';
 
 export interface ServerOptions {
   loadUsers: UserLoader;
-  sender: PushSender;
+  /** Either may be missing when the relay is only set up for one platform. */
+  senders: { apns?: PushSender; fcm?: FcmSender };
   logger?: FastifyServerOptions['logger'];
 }
 
 interface PushBody {
   deviceToken: string;
-  environment: Environment;
+  environment: Environment | 'fcm';
   title: string;
   body: string;
 }
 
-// APNs reasons that mean the token will never work again, so the controller should forget it.
-const deadTokenReasons = new Set(['Unregistered', 'BadDeviceToken', 'ExpiredToken']);
+// APNs and FCM reasons that mean the token will never work again, so the controller should
+// forget it. FCM answers INVALID_ARGUMENT for a malformed token; the rest of the message is ours.
+const deadTokenReasons = new Set(['Unregistered', 'BadDeviceToken', 'ExpiredToken', 'UNREGISTERED', 'INVALID_ARGUMENT']);
 
-export function buildServer({ loadUsers, sender, logger = false }: ServerOptions) {
+export function buildServer({ loadUsers, senders, logger = false }: ServerOptions) {
   const app = Fastify({ logger });
 
   app.get('/healthz', async () => ({ ok: true }));
@@ -41,20 +44,31 @@ export function buildServer({ loadUsers, sender, logger = false }: ServerOptions
 
     const { deviceToken, environment, title, body } = request.body as PushBody;
 
+    const { apns, fcm } = senders;
+    const alert = { title, body };
+    const service = environment === 'fcm' ? 'FCM' : 'APNs';
+    const send = environment === 'fcm'
+      ? fcm && (() => fcm.send(deviceToken, alert))
+      : apns && (() => apns.send(deviceToken, environment, alert));
+
+    if (!send) {
+      return reply.code(400).send({ error: `This relay isn't set up for ${environment === 'fcm' ? 'Android' : 'iOS'}.` });
+    }
+
     let result;
 
     try {
-      result = await sender.send(deviceToken, environment, { title, body });
+      result = await send();
     } catch (error) {
-      request.log.error({ err: error }, 'APNs request failed');
-      return reply.code(502).send({ error: "Couldn't reach APNs." });
+      request.log.error({ err: error }, `${service} request failed`);
+      return reply.code(502).send({ error: `Couldn't reach ${service}.` });
     }
 
     if (result.ok) {
       return reply.code(202).send({});
     }
 
-    request.log.warn({ status: result.status, reason: result.reason, token: redact(deviceToken) }, 'APNs rejected push');
+    request.log.warn({ status: result.status, reason: result.reason, token: redact(deviceToken) }, `${service} rejected push`);
 
     if (result.status === 410 || deadTokenReasons.has(result.reason)) {
       return reply.code(410).send({ error: result.reason });
@@ -88,13 +102,18 @@ function validate(body: unknown): string | undefined {
 
   const { deviceToken, environment, title, body: text } = body as Record<string, unknown>;
 
-  // The token goes into the APNs request path, so only accept what a real one looks like.
-  if (typeof deviceToken !== 'string' || !/^[0-9a-fA-F]+$/.test(deviceToken)) {
-    return 'deviceToken must be a hex string.';
+  if (environment !== 'sandbox' && environment !== 'production' && environment !== 'fcm') {
+    return 'environment must be "sandbox", "production" or "fcm".';
   }
 
-  if (environment !== 'sandbox' && environment !== 'production') {
-    return 'environment must be "sandbox" or "production".';
+  // An APNs token goes into the request path, so only accept what a real one looks like. FCM
+  // tokens are longer and not hex, and only ever go in a JSON body.
+  if (environment === 'fcm') {
+    if (typeof deviceToken !== 'string' || !/^[A-Za-z0-9:_-]+$/.test(deviceToken)) {
+      return 'deviceToken must be an FCM registration token.';
+    }
+  } else if (typeof deviceToken !== 'string' || !/^[0-9a-fA-F]+$/.test(deviceToken)) {
+    return 'deviceToken must be a hex string.';
   }
 
   if (typeof title !== 'string') {

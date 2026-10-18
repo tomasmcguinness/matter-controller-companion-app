@@ -11,3 +11,12 @@ xcuserdata/
 
 # macOS
 .DS_Store
+
+# Android / Gradle
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.kotlin/
+android/app/google-services.json
