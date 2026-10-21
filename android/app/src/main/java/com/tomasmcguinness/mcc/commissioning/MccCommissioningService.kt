@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import com.google.android.gms.home.matter.commissioning.CommissioningCompleteMetadata
-import com.google.android.gms.home.matter.commissioning.CommissioningError
+import com.google.android.gms.home.matter.commissioning.CommissioningResult
 import com.google.android.gms.home.matter.commissioning.CommissioningRequestMetadata
 import com.google.android.gms.home.matter.commissioning.CommissioningService
 import com.tomasmcguinness.mcc.data.MccClient
@@ -76,7 +76,7 @@ class MccCommissioningService : Service(), CommissioningService.Callback {
                 // Report it so Play Services shows a failure rather than claiming the device
                 // was added.
                 Log.e(TAG, "Commissioning failed", e)
-                delegate.sendCommissioningError(CommissioningError.OTHER)
+                delegate.sendCommissioningError(CommissioningService.CommissioningError.OTHER)
             }
         }
     }
