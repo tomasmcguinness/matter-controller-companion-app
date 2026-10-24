@@ -15,11 +15,22 @@ struct Controller: Codable, Identifiable, Equatable, Hashable, Sendable {
     /// this controller.
     var relayUsername: String?
 
-    init(id: UUID = UUID(), name: String, url: URL, relayUsername: String? = nil) {
+    /// The Thread network devices commissioned onto this controller should join, by extended
+    /// PAN ID. Its credentials have to be stored on the phone (Settings → Thread Networks);
+    /// nil means the system's preferred network.
+    var threadExtendedPANID: Data?
+
+    /// The chosen network's name, kept so it can still be shown if its credentials are removed.
+    var threadNetworkName: String?
+
+    init(id: UUID = UUID(), name: String, url: URL, relayUsername: String? = nil,
+         threadExtendedPANID: Data? = nil, threadNetworkName: String? = nil) {
         self.id = id
         self.name = name
         self.url = url
         self.relayUsername = relayUsername
+        self.threadExtendedPANID = threadExtendedPANID
+        self.threadNetworkName = threadNetworkName
     }
 }
 

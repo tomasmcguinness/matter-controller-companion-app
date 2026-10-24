@@ -12,6 +12,7 @@
 		<string>_http._tcp</string>
 		<string>_matter._tcp</string>
 		<string>_matterc._tcp</string>
+		<string>_meshcop._udp</string>
 		<string>_matterd._tcp</string>
 	</array>
 </dict>

@@ -43,6 +43,7 @@ targets:
         aps-environment: development
         com.apple.security.application-groups:
           - group.com.tomasmcguinness.matter-controller-companion
+        com.apple.developer.networking.manage-thread-network-credentials: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.tomasmcguinness.matter-controller-companion

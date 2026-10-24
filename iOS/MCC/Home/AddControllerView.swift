@@ -12,6 +12,8 @@ struct AddControllerView: View {
     @State private var addressText: String
     @State private var relayUsername: String
     @State private var relayPassword: String
+    @State private var threadExtendedPANID: Data?
+    @State private var threadNetworks = ThreadNetworkStore()
     @State private var isVerifying = false
     @State private var errorMessage: String?
 
@@ -22,6 +24,7 @@ struct AddControllerView: View {
         _addressText = State(initialValue: editing?.url.absoluteString ?? "")
         _relayUsername = State(initialValue: editing?.relayUsername ?? "")
         _relayPassword = State(initialValue: editing.flatMap { RelayCredentialStore.password(for: $0.id) } ?? "")
+        _threadExtendedPANID = State(initialValue: editing?.threadExtendedPANID)
     }
 
     /// The password this controller had when the sheet opened, to tell whether it changed.
@@ -30,6 +33,26 @@ struct AddControllerView: View {
     }
 
     private var isEditing: Bool { editing != nil }
+
+    /// The name of the chosen network when its credentials are no longer stored, so the picker
+    /// still has something to show for it.
+    private var missingThreadNetworkName: String? {
+        guard !threadNetworks.isLoading,
+              let threadExtendedPANID,
+              !threadNetworks.networks.contains(where: { $0.extendedPANID == threadExtendedPANID }) else {
+            return nil
+        }
+
+        return editing?.threadNetworkName ?? threadExtendedPANID.hexString
+    }
+
+    /// The name to save alongside the chosen network.
+    private var threadNetworkName: String? {
+        guard let threadExtendedPANID else { return nil }
+
+        return threadNetworks.networks.first { $0.extendedPANID == threadExtendedPANID }?.name
+            ?? editing?.threadNetworkName
+    }
 
     var body: some View {
         NavigationStack {
@@ -59,6 +82,27 @@ struct AddControllerView: View {
                 } footer: {
                     Text("The controller signs in to the push relay with these to send you notifications. Leave them blank if this controller shouldn't send notifications.")
                 }
+
+                Section {
+                    Picker("Network", selection: $threadExtendedPANID) {
+                        Text("System Default").tag(Data?.none)
+
+                        ForEach(threadNetworks.networks) { network in
+                            Text(network.name).tag(Data?.some(network.extendedPANID))
+                        }
+
+                        if let missing = missingThreadNetworkName {
+                            Text("\(missing) (missing)").tag(threadExtendedPANID)
+                        }
+                    }
+                } header: {
+                    Text("Thread Network")
+                } footer: {
+                    Text("The Thread network devices commissioned onto this controller join. Add networks in Settings.")
+                }
+            }
+            .task {
+                await threadNetworks.load()
             }
             .navigationTitle(isEditing ? "Edit Controller" : "Add Controller")
             .toolbar {
@@ -104,6 +148,7 @@ struct AddControllerView: View {
                 || url != editing.url
                 || trimmedRelayUsername != editing.relayUsername
                 || relayPassword != originalPassword
+                || threadExtendedPANID != editing.threadExtendedPANID
         }
 
         return true
@@ -118,7 +163,9 @@ struct AddControllerView: View {
         let candidate = Controller(id: editing?.id ?? UUID(),
                                    name: trimmedName,
                                    url: url,
-                                   relayUsername: trimmedRelayUsername)
+                                   relayUsername: trimmedRelayUsername,
+                                   threadExtendedPANID: threadExtendedPANID,
+                                   threadNetworkName: threadNetworkName)
 
         isVerifying = true
         defer { isVerifying = false }

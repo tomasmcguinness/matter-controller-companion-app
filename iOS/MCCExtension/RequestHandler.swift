@@ -46,10 +46,39 @@ final class RequestHandler: MatterAddDeviceExtensionRequestHandler {
         }
     }
 
-    /// The controller supplies the Thread dataset itself when it pairs, so there is nothing
-    /// for us to choose here.
+    /// iOS puts the device on its Thread network before `commissionDevice` is ever called, so
+    /// the controller only pairs it once it's already on the network. This is where we say
+    /// which network that is.
+    ///
+    /// Controllers can name one (Edit Controller → Thread Network) whose credentials MCC
+    /// stored on the phone; otherwise the system's preferred network is used. A chosen network
+    /// is returned even if the device's scan didn't see it, so a wrong setup fails visibly
+    /// rather than quietly landing the device on the preferred network.
     override func selectThreadNetwork(from threadScanResults: [MatterAddDeviceExtensionRequestHandler.ThreadScanResult]) async throws -> MatterAddDeviceExtensionRequestHandler.ThreadNetworkAssociation {
-        .defaultSystemNetwork
+        guard let controllerID = ControllerStore.pendingCommissioningControllerID,
+              let controller = ControllerStore.controller(id: controllerID),
+              let extendedPANIDBytes = controller.threadExtendedPANID else {
+            logger.info("No Thread network chosen; using the system default")
+            return .defaultSystemNetwork
+        }
+
+        // Stored as the 8 bytes ThreadNetwork reports; MatterSupport wants them as a
+        // big-endian integer.
+        guard extendedPANIDBytes.count == 8 else {
+            logger.error("Stored extended PAN ID is \(extendedPANIDBytes.count) bytes, not 8; using the system default")
+            return .defaultSystemNetwork
+        }
+
+        let extendedPANID = extendedPANIDBytes.reduce(UInt64(0)) { $0 << 8 | UInt64($1) }
+        let xpanid = String(format: "%016llx", extendedPANID)
+
+        if threadScanResults.contains(where: { $0.extendedPANID == extendedPANID }) {
+            logger.info("Joining Thread network \(xpanid, privacy: .public)")
+        } else {
+            logger.error("Thread network \(xpanid, privacy: .public) wasn't in the device's scan results")
+        }
+
+        return .network(extendedPANID: extendedPANID)
     }
 
     /// This is an Ethernet and Thread system; Wi-Fi devices aren't expected, but the system

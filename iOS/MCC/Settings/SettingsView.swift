@@ -4,14 +4,18 @@ struct SettingsView: View {
 
     @State private var push = PushManager.shared
     @State private var controllers: [Controller] = []
+    @State private var threadNetworks = ThreadNetworkStore()
+    @State private var isShowingAddThreadNetwork = false
 
     var body: some View {
         NavigationStack {
             Form {
                 notificationsSection
 
+                threadNetworksSection
+
                 Section("About") {
-                    LabeledContent("App", value: "The Matter Controller Companion App")
+                    LabeledContent("App", value: "Matter Controller Companion")
                     LabeledContent("Version", value: Bundle.main.shortVersion)
                     LabeledContent("Build", value: Bundle.main.buildNumber)
                 }
@@ -24,8 +28,19 @@ struct SettingsView: View {
             } message: {
                 Text(push.errorMessage ?? "")
             }
+            .alert("Thread Network Problem",
+                   isPresented: Binding(get: { threadNetworks.errorMessage != nil },
+                                        set: { if !$0 { threadNetworks.errorMessage = nil } })) {
+                Button("OK") { threadNetworks.errorMessage = nil }
+            } message: {
+                Text(threadNetworks.errorMessage ?? "")
+            }
+            .sheet(isPresented: $isShowingAddThreadNetwork) {
+                AddThreadNetworkView(store: threadNetworks)
+            }
             .task {
                 controllers = ControllerStore.controllers
+                await threadNetworks.load()
                 await push.refreshAuthorizationStatus()
 
                 // Not tied to this view's lifetime, so switching tabs doesn't cancel it midway.
@@ -85,6 +100,70 @@ struct SettingsView: View {
             } else {
                 Text("Lets your controllers send you notifications.")
             }
+        }
+    }
+}
+
+extension SettingsView {
+
+    fileprivate var threadNetworksSection: some View {
+        Section {
+            if let preferred = threadNetworks.preferredNetwork {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(preferred.name)
+
+                        Text(preferred.extendedPANID.hexString)
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    Text("Preferred")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                HStack {
+                    Button("Show Preferred Network") {
+                        Task { await threadNetworks.loadPreferred() }
+                    }
+                    .disabled(threadNetworks.isLoadingPreferred)
+
+                    if threadNetworks.isLoadingPreferred {
+                        Spacer()
+                        ProgressView()
+                    }
+                }
+            }
+
+            ForEach(threadNetworks.networks) { network in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(network.name)
+
+                    Text(network.extendedPANID.hexString)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .onDelete { offsets in
+                let doomed = offsets.map { threadNetworks.networks[$0] }
+
+                Task {
+                    for network in doomed {
+                        await threadNetworks.delete(network)
+                    }
+                }
+            }
+
+            Button("Add Network…") {
+                isShowingAddThreadNetwork = true
+            }
+        } header: {
+            Text("Thread Networks")
+        } footer: {
+            Text("Networks stored here can be chosen for a controller when you edit it, so devices commissioned onto that controller join that network instead of the phone's preferred one.")
         }
     }
 }

@@ -20,6 +20,8 @@
 		5FB399D2C5EA52DA4D44B3C6 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6243E43AE875BC945B367C6A /* ContentView.swift */; };
 		6C0E04F6DABBE44361DFC618 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A9B66E450878D75A73E2C4B /* Assets.xcassets */; };
 		A042D7B9A6EC781DFD07BC96 /* ControllerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0D1708AFB076080BABF7E2 /* ControllerStore.swift */; };
+		A1C0FFEE0000000000000001 /* ThreadNetworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE0000000000000002 /* ThreadNetworkStore.swift */; };
+		A1C0FFEE0000000000000003 /* AddThreadNetworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE0000000000000004 /* AddThreadNetworkView.swift */; };
 		A1FF9659BA4C607761AB9B4A /* MCCExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 56072F0A296FEB5543755AAB /* MCCExtension.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A9ED4BC03F2506738DBBFA7F /* MCCClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BF597BA39654498EC71B827 /* MCCClient.swift */; };
 		ABCA1BAC6F3467BD92515CFC /* MatterSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1B46F8555685371DE1D6D99 /* MatterSupport.framework */; };
@@ -74,6 +76,8 @@
 		895E22895A49FE4C04F31718 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		9A44DF2D188B187E2C5B5147 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9BF597BA39654498EC71B827 /* MCCClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCCClient.swift; sourceTree = "<group>"; };
+		A1C0FFEE0000000000000002 /* ThreadNetworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadNetworkStore.swift; sourceTree = "<group>"; };
+		A1C0FFEE0000000000000004 /* AddThreadNetworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddThreadNetworkView.swift; sourceTree = "<group>"; };
 		AF5B4EA0F631C8D6E06B1D83 /* ControllerDeviceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllerDeviceListView.swift; sourceTree = "<group>"; };
 		B1B46F8555685371DE1D6D99 /* MatterSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MatterSupport.framework; path = System/Library/Frameworks/MatterSupport.framework; sourceTree = SDKROOT; };
 		B4018BD856A184B20C1F82F5 /* Controller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controller.swift; sourceTree = "<group>"; };
@@ -119,6 +123,8 @@
 			isa = PBXGroup;
 			children = (
 				6001A4D2A4FF30E175CBA479 /* SettingsView.swift */,
+				A1C0FFEE0000000000000002 /* ThreadNetworkStore.swift */,
+				A1C0FFEE0000000000000004 /* AddThreadNetworkView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -302,6 +308,8 @@
 				27AE886ED87BBE7DA453DB2A /* MCCClient.swift in Sources */,
 				598FEA7AC86E2E558BD4B9D8 /* Models.swift in Sources */,
 				5293D7DE17DB10BF76E26E7C /* SettingsView.swift in Sources */,
+				A1C0FFEE0000000000000001 /* ThreadNetworkStore.swift in Sources */,
+				A1C0FFEE0000000000000003 /* AddThreadNetworkView.swift in Sources */,
 				3D61BE917FD6D6DC1E174EBB /* AppDelegate.swift in Sources */,
 				53E2A316D8ACFB2B007C35BC /* PushManager.swift in Sources */,
 				0204DF494F4AFAA31CDF86F1 /* PushRelay.swift in Sources */,
@@ -400,7 +408,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MCC/MCC.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -416,7 +424,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
@@ -501,14 +509,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MCCExtension/MCCExtension.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = MCCExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1.MCCExtension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -526,7 +534,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MCC/MCC.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MCC/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = MCC;
@@ -539,7 +547,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -554,14 +562,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = MCCExtension/MCCExtension.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = MCCExtension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tomasmcguinness.matter-controller-companion-v1.MCCExtension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
